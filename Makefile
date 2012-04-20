@@ -19,7 +19,7 @@ CFLAGS += -Wstrict-prototypes
 
 
 
-$(TARGET): $(TARGET).o
+$(TARGET): $(TARGET).o sha1.o hmac.o
 
 $(TARGET).hex : $(TARGET)
 	 avr-objcopy -j .data -j .text -O ihex $< $@
