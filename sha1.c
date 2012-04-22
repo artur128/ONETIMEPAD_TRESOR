@@ -117,7 +117,7 @@ void SHA1Init(void) {
 
 // Hashes blocks of 64 bytes of data.
 // Only the last block *must* be smaller than 64 bytes.
-void SHA1Block(const unsigned char* data, const uint8_t len) {
+void SHA1Block(unsigned char* data, uint8_t len) {
   uint8_t i;
   
   // clear all bytes in data block that are not overwritten anyway
@@ -182,16 +182,6 @@ void SHA1Done(void) {
 #endif 
 }
 
-// Hashes just one arbitrarily sized chunk of data
-void SHA1Once(const unsigned char* data, int len) {
-  SHA1Init();
-  while (len>=0) {
-    SHA1Block(data, len>64?64:len);
-    len -= 64;
-    data += 64;
-  }
-  SHA1Done();
-}
 
 
 

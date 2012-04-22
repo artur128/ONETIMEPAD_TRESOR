@@ -28,9 +28,8 @@
 extern unsigned char shadigest[20];
 
 void SHA1Init(void);
-void SHA1Block(const unsigned char* data, const uint8_t len);
+void SHA1Block(unsigned char* data, uint8_t len);
 void SHA1Done(void);
-void SHA1Once(const unsigned char* data, int len);
 
 #endif
 
