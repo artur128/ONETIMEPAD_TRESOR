@@ -1,5 +1,5 @@
 TARGET = main
-MCU    = atmega48
+MCU    = atmega88
 CC     = avr-gcc
 F_CPU = 8000000
 OPT = s
@@ -10,16 +10,13 @@ CPPDEFS = -DF_CPU=$(F_CPU)UL
 CFLAGS  =-mmcu=$(MCU) -Wall -Os $(CDEFS) -std=gnu99
 LDFLAGS =-mmcu=$(MCU)
 
-CFLAGS += -funsigned-char
 CFLAGS += -funsigned-bitfields
-CFLAGS += -fpack-struct
 CFLAGS += -fshort-enums
 CFLAGS += -Wall
-CFLAGS += -Wstrict-prototypes
 
 
 
-$(TARGET): $(TARGET).o sha1.o hmac.o
+$(TARGET): $(TARGET).o sha1.o hmac.o time.o
 
 $(TARGET).hex : $(TARGET)
 	 avr-objcopy -j .data -j .text -O ihex $< $@
