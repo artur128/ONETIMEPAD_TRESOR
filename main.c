@@ -13,10 +13,10 @@
 
 int main(void)
 {
-	uint16_t timeout=0;
+	uint16_t timeout=1000;
 	char typfail=0;
 	signed char key;
-	signed char pin[14];
+	signed char pin[20];
 	signed char pini=-1;
 	enum states { CHECK_PIN_STATE, SET_TIME_STATE, SET_KEY, SET_MASTER_KEY} state=CHECK_PIN_STATE;
 	//init IO-pins
@@ -37,8 +37,8 @@ int main(void)
 
 			if (state==CHECK_PIN_STATE){
 				switch(key){
-					case 10: 
-					case 12: 
+					case 10:
+					case 12:
 						if(check_pin(pin,pini)){
 							open_case();
 							typfail=0;
@@ -51,7 +51,7 @@ int main(void)
 								error();
 							}
 						} pini=-1; break;
-					case 13: state=SET_TIME_STATE; LEDPORT|=(1<<YELLOWPIN); LEDPORT|=(1<<GREENPIN); pini=-1; break;
+					case 13: state=SET_TIME_STATE; LEDPORT|=(1<<YELLOWPIN); LEDPORT|=(1<<GREENPIN); pini=-1; timeout=5000; break;
 					case 0: 
 					case 1:
 					case 2:
@@ -70,12 +70,12 @@ int main(void)
 				}
 			}else if(state==SET_TIME_STATE){
 				switch(key){
-					case 10: 
-					case 12: state=CHECK_PIN_STATE; LEDPORT&=~(1<<YELLOWPIN); LEDPORT&=~(1<<GREENPIN); pini=-1; break;
+					case 10: state=SET_MASTER_KEY; LEDPORT&=~(1<<YELLOWPIN); pini=-1; timeout=10000; break;
+					case 12: state=CHECK_PIN_STATE; LEDPORT&=~(1<<YELLOWPIN); LEDPORT&=~(1<<GREENPIN); pini=-1; timeout=1000; break;
 					case 13: 
 						if(set_time(pin,pini)){
 							piep(snd_successes);
-							state=CHECK_PIN_STATE; LEDPORT&=~(1<<YELLOWPIN); LEDPORT&=~(1<<GREENPIN); pini=-1;
+							state=CHECK_PIN_STATE; LEDPORT&=~(1<<YELLOWPIN); LEDPORT&=~(1<<GREENPIN); pini=-1; timeout=1000;
 						}else{
 							error();
 							LEDPORT|=(1<<YELLOWPIN);
@@ -98,15 +98,47 @@ int main(void)
 					error();
 					LEDPORT|=(1<<YELLOWPIN);
 				}
+			}else if(state==SET_MASTER_KEY){
+				switch(key){
+					case 10: 
+					case 12: state=CHECK_PIN_STATE; LEDPORT&=~(1<<YELLOWPIN); LEDPORT&=~(1<<GREENPIN); pini=-1; break;
+					case 13: 
+						if(set_master_key(pin,pini)){
+							piep(snd_successes);
+							state=CHECK_PIN_STATE; LEDPORT&=~(1<<YELLOWPIN); LEDPORT&=~(1<<GREENPIN); pini=-1; timeout=1000;
+						}else{
+							error();
+						} 
+						pini=-1; break;
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+					case 8: 
+					case 9: pin[++pini]=key; piep(snd_tastendruck); 
+					default: break;
+				}
+				if(pini>19){
+					pini=-1;
+					error();
+					LEDPORT|=(1<<YELLOWPIN);
+				}
 			}
 			
 			_delay_ms(5);
-			timeout+=1;
-			if(timeout>1000){
+			timeout-=1;
+			if(timeout<1){
 				piep(snd_sleep);
-				timeout=0;
 				pini=-1;
-				state=CHECK_PIN_STATE;
+				typfail=0;
+
+				timeout=1000;
+				state=CHECK_PIN_STATE; LEDPORT&=~(1<<YELLOWPIN); LEDPORT&=~(1<<GREENPIN); pini=-1;
+
 				sei();
 				set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 				sleep_mode();
@@ -117,6 +149,19 @@ int main(void)
 }
 
 ISR(PCINT0_vect) {
+}
+
+char set_master_key(signed char *pin,signed char pini){
+	char succ=1;
+	if (pini<14) {return 0;}
+	for(int i=0;i<=pini;i++){
+		eeprom_busy_wait();
+		eeprom_write_byte(i,pin[i]+30);
+	}
+	eeprom_busy_wait();
+	eeprom_write_byte(pini+1,0);
+	eeprom_busy_wait();
+	return succ;
 }
 
 //nur bei 8mhz ist das ein delay_us und wenn der comiler nicht optimiert: hier muss asm-code stehen

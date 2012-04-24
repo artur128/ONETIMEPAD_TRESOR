@@ -105,6 +105,7 @@ signed char getkey(void);
 
 void open_case(void);
 char check_pin(signed char *pin,signed char pini);
+char set_master_key(signed char *pin,signed char pini);
 
 int main(void);
 
