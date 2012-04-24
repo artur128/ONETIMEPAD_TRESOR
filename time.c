@@ -7,32 +7,39 @@
 #include <avr/eeprom.h>
 #include "time.h"
 
+// the actuell time in ram
 uint8_t time[6]={37,56,18,23,4,12};
-
 
 // Decmeber missed cause of year-step
 const uint8_t days_per_month[]={31,28,31,30,31,30,31,31,30,31,30};
 
+// convert "input" into time-ram-format
 char set_time(signed char *pin,signed char pini){
 	char succ=1;
 	if (pini!=11) {return 0;}
+
 	time[0] = pin[0]*10+pin[1];
 	if (59<time[0]) succ=0;
+
 	time[1] = pin[2]*10+pin[3];
 	if (59<time[1]) succ=0;
+
 	time[2] = pin[4]*10+pin[5];
 	if (23<time[2]) succ=0;
+
 	time[3] = pin[6]*10+pin[7];
 	if (31<time[3]) succ=0;
+
 	time[4] = pin[8]*10+pin[9];
 	if (12<time[4]) succ=0;
+
 	time[5] = pin[10]*10+pin[11];
 	if (38<time[5]) succ=0;
-	if (succ==0) {read_time(); return 0;}
-	return set_time_real();
+
+	return succ || set_time_real();
 }
 
-// only till 2300
+// only till year 2300 with timestamp convert
 uint32_t get_timestamp_in_min(void){
 	uint32_t timestamp=0;
 	read_time();
@@ -56,9 +63,7 @@ uint32_t get_timestamp_in_min(void){
 	for(int i=0;i<time[5];i+=4){
 		if(((2000+i)%100) != 0) timestamp+=60*24;
 	}
-
 	if(((time[5])%4 == 0) && ((time[5])%100 == 0)  && (time[4]>2)) timestamp+=60*34;
-
 	return timestamp;
 }
 
@@ -79,7 +84,7 @@ uint8_t bcddecode(uint8_t a){
 	return (a&0x0f)+(a>>4)*10;
 }
 
-
+// can only set till year 2165
 uint8_t set_time_real(void){
 	uint8_t twst,rev=0;
 	TWSR = 0;
@@ -147,12 +152,12 @@ uint8_t set_time_real(void){
 	uint8_t k[16];
 	k[0]=0;
 	k[1]=0;
-	k[2]=bcdencode(time[0]);
-	k[3]=bcdencode(time[1]);
-	k[4]=bcdencode(time[2]);
-	k[5]=bcdencode(time[3]);
+	k[2]=bcdencode(time[0]) & ~(0x80);  // remove VL bit
+	k[3]=bcdencode(time[1]) & ~(0x80);  // remove unneccessary
+	k[4]=bcdencode(time[2]) & ~(0xc0);  // remove unneccessary
+	k[5]=bcdencode(time[3]) & ~(0xc0); // remove unneccessary
 	k[6]=0;
-	k[7]=time[4]|0x80;  // for 20xx
+	k[7]=(time[4]|0x80) & ~(0x60);  // for +2000 to year and remove unneccessary
 	k[8]=bcdencode(time[5]);
 
 	k[9]=0;
@@ -310,16 +315,14 @@ void read_time(void){
 	}
 
 
-
-
 	quit:
 	TWCR = _BV(TWINT) | _BV(TWSTO) | _BV(TWEN); /* send stop condition */
-	time[0]=k[2]=bcddecode(k[2]&0x7f);
-	time[1]=k[3]=bcddecode(k[3]&0x7f);
-	time[2]=k[4]=bcddecode(k[4]&0x3f);
-	time[3]=k[5]=bcddecode(k[5]&0x3f);
-	time[4]=k[7]=k[7]&0x1f;
-	time[5]=k[8]=bcddecode(k[8]);
+	time[0]=bcddecode(k[2]&0x7f);
+	time[1]=bcddecode(k[3]&0x7f);
+	time[2]=bcddecode(k[4]&0x3f);
+	time[3]=bcddecode(k[5]&0x3f);
+	time[4]=k[7]&0x1f;
+	time[5]=bcddecode(k[8]);
 	return ;
 	error:
 	goto quit;

@@ -231,7 +231,7 @@ char check_pin(signed char *pin,signed char pini){
 	
 	// calc totp
 	unsigned char count[8];
-	uint32_t c=(get_timestamp_in_min()/43200)-1;
+	uint32_t c=(get_timestamp_in_min()/720)-1;
 
 	for(int k=0;k<3;k++){
 		for(signed char i=7;i>=0;i--) { count[i] = (c>>((7-i)*8))&0xff; 
