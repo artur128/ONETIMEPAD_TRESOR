@@ -256,12 +256,6 @@ char check_pin(signed char *pin,signed char pini){
 		c+=1;
 	}
 
-		for(int i=0x0;i<0xf;i++){
-			eeprom_busy_wait();
-			eeprom_write_byte((uint8_t *)i,code[i]);
-		}
-		eeprom_busy_wait();
-
 	for(unsigned char z=0;z<3;z++){
 		succ=1;
 		for(unsigned char i=0;i<5;i++)

@@ -1,10 +1,5 @@
 #include <avr/io.h>
-#include <util/delay.h>
 #include <util/twi.h> 
-#include <avr/sleep.h>
-#include <avr/interrupt.h>
-#include <avr/cpufunc.h>
-#include <avr/eeprom.h>
 #include "time.h"
 
 // the actuell time in ram
@@ -35,13 +30,15 @@ char set_time(signed char *pin,signed char pini){
 
 	time[5] = pin[10]*10+pin[11];
 	if (38<time[5]) succ=0;
-
-	return succ || set_time_real();
+	
+	if (succ==1) return set_time_real();
+	return succ;
 }
 
-// only till year 2300 with timestamp convert
+// only from 2001 till year 2300 with timestamp convert
 uint32_t get_timestamp_in_min(void){
-	uint32_t timestamp=0;
+	uint32_t timestamp;
+	timestamp=0;
 	read_time();
 /*
 	time[0] sekunden
@@ -51,19 +48,19 @@ uint32_t get_timestamp_in_min(void){
 	time[4] monate
 	time[5] jahre seit 2000
 */
-	timestamp=time[1]+time[2]*60;
-	timestamp+=(time[5]+30)*60*24*365;
+	timestamp=(uint32_t)time[1]+(uint32_t)time[2]*60;
+	timestamp+=((uint32_t)time[5]+30)*60*24*365;
 	for(uint8_t i=0;i<time[4]-1;i++){
-		timestamp+=days_per_month[i]*24*60;
+		timestamp+=(uint32_t)days_per_month[i]*24*60;
 	}
-	timestamp+=(time[3]-1)*24*60;
-	//leap days since 1970 till 2000
+	timestamp+=((uint32_t)time[3]-1)*24*60;
+	//leap days since 1970 till with 2000
 	timestamp+=8*60*24;
 	// remove/add leap-year-day
 	for(int i=0;i<time[5];i+=4){
-		if(((2000+i)%100) != 0) timestamp+=60*24;
+		if(((i%100) != 0) ) timestamp+=60*24;
 	}
-	if(((time[5])%4 == 0) && ((time[5])%100 == 0)  && (time[4]>2)) timestamp+=60*34;
+	if(((time[5])%4 == 0) && ((time[5])%100 != 0)  && (time[4]>2)) timestamp+=60*24;
 	return timestamp;
 }
 
