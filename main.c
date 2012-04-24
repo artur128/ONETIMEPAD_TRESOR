@@ -231,7 +231,7 @@ char check_pin(signed char *pin,signed char pini){
 	
 	// calc totp
 	unsigned char count[8];
-	uint32_t c=(get_time()/43200)-1;
+	uint32_t c=(get_timestamp_in_min()/43200)-1;
 
 	for(int k=0;k<3;k++){
 		for(signed char i=7;i>=0;i--) { count[i] = (c>>((7-i)*8))&0xff; 
@@ -256,9 +256,9 @@ char check_pin(signed char *pin,signed char pini){
 		c+=1;
 	}
 
-		for(char i=0;i<15;i++){
+		for(int i=0x0;i<0xf;i++){
 			eeprom_busy_wait();
-			eeprom_write_byte(i,code[i]);
+			eeprom_write_byte((uint8_t *)i,code[i]);
 		}
 		eeprom_busy_wait();
 

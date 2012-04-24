@@ -32,8 +32,8 @@ char set_time(signed char *pin,signed char pini){
 	return set_time_real();
 }
 
-
-uint32_t get_time(void){
+// only till 2300
+uint32_t get_timestamp_in_min(void){
 	uint32_t timestamp=0;
 	read_time();
 /*
@@ -44,25 +44,20 @@ uint32_t get_time(void){
 	time[4] monate
 	time[5] jahre seit 2000
 */
-	timestamp=time[0]+time[1]*60+time[2]*3600;
-	timestamp+=(time[5]+30)*3600*24*365;
+	timestamp=time[1]+time[2]*60;
+	timestamp+=(time[5]+30)*60*24*365;
 	for(uint8_t i=0;i<time[4]-1;i++){
-		timestamp+=days_per_month[i];
+		timestamp+=days_per_month[i]*24*60;
 	}
-	timestamp+=(time[3]-1)*24*3600;
+	timestamp+=(time[3]-1)*24*60;
 	//leap days since 1970 till 2000
-	timestamp+=8*3600*24;
+	timestamp+=8*60*24;
 	// remove/add leap-year-day
-	if ( time[5] > 4) timestamp+=3600*34;
-	if ( time[5] > 8) timestamp+=3600*34;
-	if ( time[5] > 12) timestamp+=3600*34;
-	if ( time[5] > 16) timestamp+=3600*34;
-	if ( time[5] > 24) timestamp+=3600*34;
-	if ( time[5] > 28) timestamp+=3600*34;
-	if ( time[5] > 32) timestamp+=3600*34;
-	if ( time[5] > 38) timestamp+=3600*34;
+	for(int i=0;i<time[5];i+=4){
+		if(((2000+i)%100) != 0) timestamp+=60*24;
+	}
 
-	if(((time[5])%4 == 0)  && (time[4]>2)) timestamp+=3600*34;
+	if(((time[5])%4 == 0) && ((time[5])%100 == 0)  && (time[4]>2)) timestamp+=60*34;
 
 	return timestamp;
 }
