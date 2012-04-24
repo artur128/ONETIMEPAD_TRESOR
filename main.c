@@ -13,6 +13,7 @@
 
 int main(void)
 {
+	uint16_t timeout=0;
 	char typfail=0;
 	signed char key;
 	signed char pin[14];
@@ -100,10 +101,17 @@ int main(void)
 			}
 			
 			_delay_ms(5);
-			sei();
-			set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-			sleep_mode();
-			cli();
+			timeout+=1;
+			if(timeout>1000){
+				piep(snd_sleep);
+				timeout=0;
+				pini=-1;
+				state=CHECK_PIN_STATE;
+				sei();
+				set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+				sleep_mode();
+				cli();
+			}
 	}
 	return 0;
 }

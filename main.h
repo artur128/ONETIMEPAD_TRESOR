@@ -91,6 +91,7 @@ const uint16_t snd_tetris[][2]={
 
 const uint16_t snd_tastendruck[][2]={{440,212},{2000,0}};
 const uint16_t snd_successes[][2]={{250,400},{150,700},{2000,0}};
+const uint16_t snd_sleep[][2]={{440,212},{220,212},{120,212},{2000,0}};
 const uint16_t snd_error[][2]={{45,212},{120,212},{45,212},{120,212},{45,212},{2000,0}};
 
 void dus(unsigned int z);
