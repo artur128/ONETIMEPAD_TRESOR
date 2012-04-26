@@ -24,6 +24,12 @@
 #define Takt 1700
 #define TTK 80
 
+#define ERROR_KEY 55
+#define A_KEY 10
+#define B_KEY 12
+#define EXTRA_KEY 13
+/* other keys are in range 0-9 with their corresponding KEY */
+
 const uint16_t snd_indi[][2]={
 {E       ,3*TTK},
 {F       ,1*TTK},
@@ -102,6 +108,7 @@ void set_battery_status(void);
 
 signed char real_getkey(void);
 signed char getkey(void);
+signed char pressed_and_released_key(void);
 
 void open_case(void);
 char check_pin(signed char *pin,signed char pini);
