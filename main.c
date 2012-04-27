@@ -55,7 +55,7 @@ int main(void)
 							} pini=-1; 
 							break;
 						case 13:
-							state=SET_TIME_STATE; pini=-1; 
+							state=SET_TIME_STATE; pini=-1; wake_timeout=10000; 
 							break;
 						case 0:case 1:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9: 
 							pin[++pini]=pressed_key; piep(snd_tastendruck); wake_timeout=1000;
@@ -68,15 +68,15 @@ int main(void)
 				LEDPORT|=(1<<YELLOWPIN) | (1<<GREENPIN); LEDPORT&=~(1<<REDPIN); 
 				switch(pressed_key){
 					case 10: 
-						state=SET_MASTER_KEY;  pini=-1; 
+						state=SET_MASTER_KEY;  pini=-1; wake_timeout=10000;
 						break;
 					case 12: 
-						state=CHECK_PIN_STATE; pini=-1; 
+						state=CHECK_PIN_STATE; pini=-1; wake_timeout=1000;
 						break;
 					case 13: 
 						if(set_time(pin,pini)){
 							piep(snd_successes);
-							state=CHECK_PIN_STATE; pini=-1;
+							state=CHECK_PIN_STATE; pini=-1; wake_timeout=1000;
 						}else{
 							error();
 						} 
@@ -93,12 +93,12 @@ int main(void)
 				LEDPORT|=(1<<YELLOWPIN) | (1<<REDPIN); LEDPORT&=~((1<<GREENPIN)); 
 				switch(pressed_key){
 					case 10:case 12: 
-						state=CHECK_PIN_STATE; pini=-1; 
+						state=CHECK_PIN_STATE; pini=-1; wake_timeout=1000;
 						break;
 					case 13: 
 						if(set_master_key(pin,pini)){
 							piep(snd_successes);
-							state=CHECK_PIN_STATE; pini=-1;
+							state=CHECK_PIN_STATE; pini=-1; wake_timeout=1000;
 						}else{
 							error();
 						} 
@@ -110,7 +110,7 @@ int main(void)
 				}
 				break;
 			default:
-				state=CHECK_PIN_STATE; pini=-1;
+				state=CHECK_PIN_STATE; pini=-1; wake_timeout=1000;
 			}
 
 			if(pini>=maxpin_length){
@@ -122,7 +122,7 @@ int main(void)
 			while(pressed_key!=ERROR_KEY)  pressed_key=getkey();
 			wake_timeout-=1;
 			if(!wake_timeout){
-				while(getkey()!=ERROR_KEY);
+				LEDPORT&=~((1<<YELLOWPIN) | (1<<REDPIN) | (1<<GREENPIN)); 
 				piep(snd_sleep);
 				state=CHECK_PIN_STATE; pini=-1; typfail=0;
 				sei();
