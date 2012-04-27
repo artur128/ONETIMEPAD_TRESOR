@@ -118,9 +118,11 @@ int main(void)
 				error();
 			}
 			
-			_delay_ms(70);
+			_delay_ms(5); // for wake_timeout
+			while(pressed_key!=ERROR_KEY)  pressed_key=getkey();
 			wake_timeout-=1;
 			if(!wake_timeout){
+				while(getkey()!=ERROR_KEY);
 				piep(snd_sleep);
 				state=CHECK_PIN_STATE; pini=-1; typfail=0;
 				sei();

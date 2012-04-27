@@ -1,6 +1,5 @@
 #include <avr/io.h>
 #include <util/twi.h> 
-#include <avr/eeprom.h>
 
 #include "time.h"
 
@@ -42,11 +41,6 @@ uint32_t get_timestamp_in_min(void){
 	uint32_t timestamp;
 	timestamp=0;
 	read_time();
-	for(int i=0;i<6;i++){
-		
-			eeprom_busy_wait();
-			eeprom_write_byte(i,time[i]);
-	}
 /*
 	time[0] sekunden
 	time[1] minuten
