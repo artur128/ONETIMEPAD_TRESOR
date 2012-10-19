@@ -260,11 +260,11 @@ void open_case(void){
 	piep(snd_successes);
 	LEDPORT|=(1<<GREENPIN);
 	OPEN;
-	_delay_ms(100);
-	for(uint16_t i=0;i<24000;i++){
-		_delay_us(110);
+	_delay_ms(120);
+	for(uint16_t i=0;i<40000;i++){
+		_delay_us(100);
 		DDRD&=~(1<<PD7);
-		_delay_us(50);
+		_delay_us(100);
 		DDRD|=(1<<PD7);
 	}
 	//_delay_ms(2000);
