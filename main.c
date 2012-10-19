@@ -247,17 +247,27 @@ void set_battery_status(void){
 	ADCSRA |= (1<<ADSC);
 	while (ADCSRA & (1<<ADSC) ) {}
 	result = ADCW;
+	ADCSRA &= ~(1<<ADEN);
 	PORTC&= ~(1<<PC2);
 
-	if(result<490)	LEDPORT|=(1<<REDPIN);
+
+	if(result<443)	LEDPORT|=(1<<REDPIN);
 }
 
 void open_case(void){
-	OPEN;
-	LEDPORT|=(1<<GREENPIN);
-	piep(snd_successes);
+	
 	set_battery_status();
-	_delay_ms(4000);
+	piep(snd_successes);
+	LEDPORT|=(1<<GREENPIN);
+	OPEN;
+	_delay_ms(100);
+	for(uint16_t i=0;i<24000;i++){
+		_delay_us(110);
+		DDRD&=~(1<<PD7);
+		_delay_us(50);
+		DDRD|=(1<<PD7);
+	}
+	//_delay_ms(2000);
 	CLOSE;
 	LEDPORT&=~((1<<GREENPIN)|(1<<REDPIN)) ;
 }
