@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <util/twi.h> 
+#include <avr/eeprom.h>
 
 #include "time.h"
 
@@ -49,6 +50,12 @@ uint32_t get_timestamp_in_min(void){
 	time[4] monate
 	time[5] jahre seit 2000
 */
+	//for(int i=0;i<=5;i++){
+	//	eeprom_busy_wait();
+	//	eeprom_write_byte((uint8_t *)i+90,(uint8_t)((uint8_t)(time[i])));
+	//}
+	//eeprom_busy_wait();
+
 	timestamp=(uint32_t)time[1]+(uint32_t)time[2]*60;
 	timestamp+=((uint32_t)time[5]+30)*60*24*365;
 	for(uint8_t i=0;i<time[4]-1;i++){
@@ -79,7 +86,7 @@ uint8_t bcdencode(uint8_t a){
 }
 
 uint8_t bcddecode(uint8_t a){
-	return (a&0x0f)+(a>>4)*10;
+	return (a&0x0f)+((a>>4)&0x0f)*10;
 }
 
 // can only set till year 2165
@@ -155,7 +162,7 @@ uint8_t set_time_real(void){
 	k[4]=bcdencode(time[2]) & ~(0xc0);  // remove unneccessary
 	k[5]=bcdencode(time[3]) & ~(0xc0); // remove unneccessary
 	k[6]=0;
-	k[7]=(time[4]|0x80) & ~(0x60);  // for +2000 to year and remove unneccessary
+	k[7]=bcdencode(time[4]) & ~(0xe0);  // for +2000 to year and remove unneccessary
 	k[8]=bcdencode(time[5]);
 
 	k[9]=0;
@@ -319,7 +326,7 @@ void read_time(void){
 	time[1]=bcddecode(k[3]&0x7f);
 	time[2]=bcddecode(k[4]&0x3f);
 	time[3]=bcddecode(k[5]&0x3f);
-	time[4]=k[7]&0x1f;
+	time[4]=bcddecode(k[7]&0x1f);
 	time[5]=bcddecode(k[8]);
 	return ;
 	error:
