@@ -50,12 +50,12 @@ uint32_t get_timestamp_in_min(void){
 	time[4] monate
 	time[5] jahre seit 2000
 */
-	//for(int i=0;i<=5;i++){
-	//	eeprom_busy_wait();
-	//	eeprom_write_byte((uint8_t *)i+90,(uint8_t)((uint8_t)(time[i])));
-	//}
-	//eeprom_busy_wait();
-
+/*	for(int i=0;i<=5;i++){
+		eeprom_busy_wait();
+		eeprom_write_byte((uint8_t *)i+90,(uint8_t)((uint8_t)(time[i])));
+	}
+	eeprom_busy_wait();
+*/
 	timestamp=(uint32_t)time[1]+(uint32_t)time[2]*60;
 	timestamp+=((uint32_t)time[5]+30)*60*24*365;
 	for(uint8_t i=0;i<time[4]-1;i++){

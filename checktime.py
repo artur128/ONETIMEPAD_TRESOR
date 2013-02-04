@@ -34,7 +34,7 @@ def bcdencode(a):
 
 
 act_time=datetime.datetime.now()
-os.system("avrdude -p atmega88 -c usbasp -U eeprom:r:han4s.uhex:h > /dev/null")
+os.system("avrdude -p atmega88 -c usbtiny -U eeprom:r:han4s.uhex:h > /dev/null")
 
 v=map(lambda x: int(x,16),open("han4s.uhex").read().split(","))
 

@@ -22,7 +22,7 @@ $(TARGET).hex : $(TARGET)
 	 avr-objcopy -j .data -j .text -O ihex $< $@
 
 program: $(TARGET).hex
-	avrdude -p $(MCU) -c usbasp -U flash:w:$(TARGET).hex -v
+	avrdude -p $(MCU) -c usbtiny -U flash:w:$(TARGET).hex -v
 
 clean:
 	rm -f *.o  *.hex $(TARGET)
