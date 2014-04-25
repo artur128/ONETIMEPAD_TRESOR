@@ -261,11 +261,11 @@ void open_case(void){
 	LEDPORT|=(1<<GREENPIN);
 	OPEN;
 	_delay_ms(200);
-	for(uint16_t i=0;i<20000;i++){
-		_delay_us(100);
-		DDRD&=~(1<<PD7);
-		_delay_us(60);
-		DDRD|=(1<<PD7);
+	for(uint16_t i=0;i<3000;i++){
+		_delay_us(1000);
+		CLOSE;
+		_delay_us(400);
+		OPEN;
 	}
 	//_delay_ms(2000);
 	CLOSE;
